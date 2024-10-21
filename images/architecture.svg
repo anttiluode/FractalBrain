@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700">
   <defs>
     <style>
       .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
@@ -25,34 +25,41 @@
   <rect x="50" y="250" width="120" height="60" class="box" />
   <text x="110" y="285" text-anchor="middle" class="label">Word Embeddings</text>
   
-  <!-- Wernicke's Module -->
-  <rect x="250" y="150" width="120" height="60" class="box module" />
-  <text x="310" y="185" text-anchor="middle" class="label">Wernicke's Module</text>
+  <!-- VAE Encoder -->
+  <rect x="50" y="350" width="120" height="60" class="box" />
+  <text x="110" y="385" text-anchor="middle" class="label">VAE Encoder</text>
   
-  <!-- VAE -->
-  <rect x="450" y="150" width="120" height="60" class="box" />
-  <text x="510" y="175" text-anchor="middle" class="label">VAE</text>
-  <text x="510" y="195" text-anchor="middle" class="small-label">(Encoder/Decoder)</text>
+  <!-- Wernicke's Module -->
+  <rect x="250" y="150" width="140" height="60" class="box module" />
+  <text x="320" y="185" text-anchor="middle" class="label">Wernicke's Module</text>
   
   <!-- Fractal Brain -->
-  <rect x="650" y="150" width="180" height="300" rx="10" ry="10" class="box module" />
-  <text x="740" y="185" text-anchor="middle" class="label">Fractal Brain</text>
+  <rect x="450" y="150" width="200" height="300" rx="10" ry="10" class="box module" />
+  <text x="550" y="185" text-anchor="middle" class="label">Fractal Brain</text>
   
   <!-- Emotional Module -->
-  <rect x="680" y="220" width="120" height="60" class="box" />
-  <text x="740" y="255" text-anchor="middle" class="label">Emotional Module</text>
+  <rect x="480" y="220" width="140" height="50" class="box" />
+  <text x="550" y="250" text-anchor="middle" class="label">Emotional Module</text>
   
   <!-- Curiosity Module -->
-  <rect x="680" y="300" width="120" height="60" class="box" />
-  <text x="740" y="335" text-anchor="middle" class="label">Curiosity Module</text>
+  <rect x="480" y="290" width="140" height="50" class="box" />
+  <text x="550" y="320" text-anchor="middle" class="label">Curiosity Module</text>
   
   <!-- Attention Mechanism -->
-  <rect x="680" y="380" width="120" height="60" class="box" />
-  <text x="740" y="415" text-anchor="middle" class="label">Attention Mechanism</text>
+  <rect x="480" y="360" width="140" height="50" class="box" />
+  <text x="550" y="390" text-anchor="middle" class="label">Attention Mechanism</text>
   
   <!-- Long-Term Memory -->
-  <rect x="650" y="480" width="180" height="60" class="box module" />
-  <text x="740" y="515" text-anchor="middle" class="label">Long-Term Memory</text>
+  <rect x="450" y="480" width="200" height="60" class="box module" />
+  <text x="550" y="515" text-anchor="middle" class="label">Long-Term Memory</text>
+  
+  <!-- VAE Decoder -->
+  <rect x="700" y="150" width="120" height="60" class="box" />
+  <text x="760" y="185" text-anchor="middle" class="label">VAE Decoder</text>
+  
+  <!-- Embedding to Text Converter -->
+  <rect x="700" y="250" width="120" height="60" class="box" />
+  <text x="760" y="285" text-anchor="middle" class="label">Embedding to Text</text>
   
   <!-- GPT Tokenizer -->
   <rect x="850" y="150" width="120" height="60" class="box" />
@@ -68,16 +75,19 @@
   <text x="910" y="385" text-anchor="middle" class="label">Output</text>
   
   <!-- Arrows -->
-  <path d="M110 110 V150" class="arrow" />
-  <path d="M110 210 V250" class="arrow" />
-  <path d="M170 180 H250" class="arrow" />
-  <path d="M370 180 H450" class="arrow" />
-  <path d="M570 180 H650" class="arrow" />
-  <path d="M830 180 H850" class="arrow" />
-  <path d="M910 210 V250" class="arrow" />
-  <path d="M910 310 V350" class="arrow" />
+  <path d="M110 110 V150" class="arrow" /> <!-- Input to BERT Tokenizer -->
+  <path d="M110 210 V250" class="arrow" /> <!-- BERT Tokenizer to Word Embeddings -->
+  <path d="M110 310 V350" class="arrow" /> <!-- Word Embeddings to VAE Encoder -->
+  <path d="M170 180 H250" class="arrow" /> <!-- BERT Tokenizer to Wernicke's Module -->
+  <path d="M170 280 H700" class="arrow" /> <!-- Word Embeddings to VAE Encoder to Fractal Brain -->
+  <path d="M170 380 H480" class="arrow" /> <!-- VAE Encoder to Fractal Brain -->
+  <path d="M650 180 H700" class="arrow" /> <!-- Fractal Brain to VAE Decoder -->
+  <path d="M760 210 V250" class="arrow" /> <!-- VAE Decoder to Embedding to Text Converter -->
+  <path d="M820 280 H850" class="arrow" /> <!-- Embedding to Text Converter to GPT Tokenizer -->
+  <path d="M910 210 V250" class="arrow" /> <!-- GPT Tokenizer to Broca's Module -->
+  <path d="M910 310 V350" class="arrow" /> <!-- Broca's Module to Output -->
   
   <!-- Bidirectional arrows -->
-  <path d="M740 450 V480" class="arrow" />
-  <path d="M740 480 V450" class="arrow" />
+  <path d="M550 450 V480" class="arrow" /> <!-- Fractal Brain to Long-Term Memory -->
+  <path d="M550 480 V450" class="arrow" /> <!-- Long-Term Memory to Fractal Brain -->
 </svg>
