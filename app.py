@@ -1216,7 +1216,7 @@ if __name__ == "__main__":
         embed_dim=300,  # Ensure this matches the GloVe embedding dimension
         latent_dim=300,
         output_dim=300,
-        max_depth=14,
+        max_depth=7, # change this to see some big changes higher the harder the calculations are 7 is good
         num_intents=10,
         num_entities=10
     )
