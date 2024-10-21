@@ -172,7 +172,7 @@ class FractalNeuron(nn.Module):
         self.axon = Axon(output_dim)
         self.attention = AttentionMechanism(output_dim)
         self.emotional_module = EnhancedEmotionalModule(num_emotions=5, input_dim=output_dim)
-        self.child_neurons = nn.ModuleList()  # Renamed to avoid conflict
+        self.child_neurons = nn.ModuleList()
         self.max_children = max_children
         self.depth = depth
         self.max_depth = max_depth
@@ -343,24 +343,28 @@ class FractalBrain(nn.Module):
                     q_embedded = self.word_embeddings(q_input_ids)  # (1, seq_length, embed_dim)
                     q_embedded = q_embedded.mean(dim=1)  # (1, embed_dim)
 
-                    # VAE Encoding
-                    _, _, _, z_q = self.vae(q_embedded)  # (1, latent_dim)
+                    # VAE Encoding and Decoding for Question
+                    q_recon, q_mu, q_logvar, z_q = self.vae(q_embedded)
+                    q_latent_output = self.brain.forward(z_q)  # (1, output_dim)
+                    q_decoded_output = self.vae.decoder(q_latent_output)  # Decode back to embedding space
 
-                    # Brain Processing
-                    q_output = self.brain.forward(z_q)  # (1, output_dim)
+                    # VAE Loss for Question
+                    vae_loss_q = self.vae.vae_loss(q_recon, q_embedded, q_mu, q_logvar)
 
                     # Convert answer to embeddings
                     a_embedded = self.word_embeddings(a_input_ids)  # (1, seq_length, embed_dim)
                     a_embedded = a_embedded.mean(dim=1)  # (1, embed_dim)
 
-                    # VAE Encoding
-                    _, _, _, a_latent = self.vae(a_embedded)  # (1, latent_dim)
+                    # VAE Encoding and Decoding for Answer
+                    a_recon, a_mu, a_logvar, a_latent = self.vae(a_embedded)
+                    a_latent_output = self.brain.forward(a_latent)  # (1, output_dim)
+                    a_decoded_output = self.vae.decoder(a_latent_output)  # Decode back to embedding space
 
-                    # Brain Processing
-                    a_output = self.brain.forward(a_latent)  # (1, output_dim)
+                    # VAE Loss for Answer
+                    vae_loss_a = self.vae.vae_loss(a_recon, a_embedded, a_mu, a_logvar)
 
                     # Calculate Loss
-                    loss = self.criterion(q_output, a_output)
+                    loss = self.criterion(q_decoded_output, a_decoded_output) + vae_loss_q + vae_loss_a
                     loss += FractalRegularization(lambda_param=0.01)(self.brain)
                     loss.backward()
 
@@ -447,8 +451,9 @@ class FractalBrain(nn.Module):
             return None
 
         try:
-            completion = self.lm_studio_client.chat.completions.create(
-                model="unsloth/Llama-3.2-3B-Instruct-GGUF",
+            completion = self.lm_studio_client.ChatCompletion.create( 
+                # You may need to change the model name here especially if you run multiple AI's in LM Studio
+                model="unsloth/Llama-2-7b-Chat-hf",
                 messages=[
                     {"role": "system", "content": "You're talking to an experimental AI that is still learning to communicate. If it doesn't respond or sends empty messages, please be patient and continue the conversation."},
                     {"role": "user", "content": message}
@@ -629,284 +634,7 @@ class VAE(nn.Module):
         return recon_loss + kld
 
 # -----------------------------
-# 4. Enhanced FractalBrain with Long-Term Memory and Multi-Modal Support
-# -----------------------------
-
-### 4.1 EnhancedFractalBrain with Enhanced Features
-class EnhancedFractalBrain(nn.Module):
-    def __init__(self, input_dim, output_dim, max_depth=5):
-        super(EnhancedFractalBrain, self).__init__()
-        self.root = FractalNeuron(input_dim, output_dim, max_depth=max_depth)
-        self.emotional_module = EnhancedEmotionalModule(num_emotions=5, input_dim=output_dim)
-        self.curiosity_module = CuriosityModule(output_dim)
-        self.attention_mechanism = AttentionMechanism(output_dim)
-        self.long_term_memory = LongTermMemory(memory_size=1000, key_size=output_dim, value_size=output_dim)
-        self.max_depth = max_depth
-
-    def forward(self, x):
-        # x: (batch_size, latent_dim)
-        emotional_modulation = self.emotional_module.modulate(x)  # (batch_size, latent_dim)
-        output = self.root(emotional_modulation)  # (batch_size, output_dim)
-        if self.curiosity_module.evaluate_novelty(x):
-            self.grow()
-        return output
-
-    def grow(self):
-        self.root.grow()
-
-    def prune(self):
-        self.root.prune()
-
-    def learn(self, x, y, learning_rate=0.01):
-        output = self.forward(x)
-        loss = (output - y).pow(2).mean()
-        loss.backward()
-
-        # Update weights
-        with torch.no_grad():
-            for param in self.parameters():
-                param -= learning_rate * param.grad
-            # Zero gradients after update
-            self.zero_grad()
-
-        self.emotional_module.update_emotion(torch.mean(output - y))
-        self.curiosity_module.update(x)
-
-    def interactive_learning(self, input_text, tokenizer, embedding_layer, index_to_word):
-        # Convert input_text to numerical representation (e.g., using embeddings)
-        x = self.text_to_embedding(input_text, tokenizer, embedding_layer)
-        output = self.forward(x)
-        # Convert output to text
-        response = self.embedding_to_text(output, index_to_word)
-        return response
-
-    def text_to_embedding(self, text, tokenizer, embedding_layer):
-        tokens = tokenizer(text)  # (batch_size, seq_length)
-        if tokens.dim() == 1:
-            tokens = tokens.unsqueeze(0)
-        embedded = embedding_layer(tokens)  # (batch_size, seq_length, embed_dim)
-        return embedded.mean(dim=1)  # (batch_size, embed_dim)
-
-    def embedding_to_text(self, embedding, index_to_word):
-        # Convert an embedding vector to the closest word in the embedding space
-        with torch.no_grad():
-            # Normalize the embedding
-            embedding_norm = F.normalize(embedding, p=2, dim=1)  # Shape: (1, embed_dim)
-            
-            # Normalize all word embeddings
-            word_embeddings_norm = F.normalize(self.word_embeddings.weight, p=2, dim=1)  # Shape: (vocab_size, embed_dim)
-            
-            # Compute cosine similarity
-            similarities = torch.matmul(embedding_norm, word_embeddings_norm.t())  # Shape: (1, vocab_size)
-            
-            # Get the index of the highest similarity
-            best_match_idx = torch.argmax(similarities, dim=1).item()
-            
-            # Retrieve the corresponding word
-            word = index_to_word.get(best_match_idx, "[UNKNOWN]")
-            
-            return word
-
-    def save_state(self, filename):
-        state = {
-            'word_embeddings_state': self.word_embeddings.state_dict(),
-            'vae_state': self.vae.state_dict(),
-            'brain_state': self.brain.state_dict(),
-            'wernickes_state': self.wernickes.state_dict(),
-            'brocas_state': self.brocas.state_dict(),
-            'optimizer_state': self.optimizer.state_dict(),
-            'scheduler_state': self.scheduler.state_dict(),
-            'word_to_index': self.word_to_index,
-            'index_to_word': self.index_to_word,
-            'next_index': self.next_index,
-            'long_term_memory': self.long_term_memory.memory.data
-        }
-        torch.save(state, filename)
-        logger.info(f"Model state saved to {filename}")
-
-    def load_state(self, filename):
-        state = torch.load(filename)
-        self.word_to_index = state['word_to_index']
-        self.index_to_word = state['index_to_word']
-        self.next_index = state['next_index']
-        self.word_embeddings.load_state_dict(state['word_embeddings_state'])
-        self.vae.load_state_dict(state['vae_state'])
-        self.brain.load_state_dict(state['brain_state'])
-        self.wernickes.load_state_dict(state['wernickes_state'])
-        self.brocas.load_state_dict(state['brocas_state'])
-        self.optimizer.load_state_dict(state['optimizer_state'])
-        self.scheduler.load_state_dict(state['scheduler_state'])
-        self.long_term_memory.memory.data = state.get(
-            'long_term_memory', 
-            torch.randn(1000, self.brain.root.soma.weights.size(1) + self.brain.root.soma.weights.size(1))
-        )
-        logger.info(f"Model state loaded from {filename}")
-
-    def train_on_qa_pairs(self, qa_pairs, epochs=10):
-        if not isinstance(qa_pairs, list) or len(qa_pairs) == 0:
-            raise ValueError("qa_pairs must be a non-empty list")
-
-        logger.info(f"Training on {len(qa_pairs)} Q&A pairs for {epochs} epochs...")
-        for epoch in range(epochs):
-            total_loss = 0
-            errors = 0
-            random.shuffle(qa_pairs)
-            for i, (question, answer) in enumerate(qa_pairs):
-                self.optimizer.zero_grad()
-
-                try:
-                    # Tokenize question and answer
-                    q_input_ids, q_attention_mask = self.tokenize_input(question)
-                    a_input_ids, a_attention_mask = self.tokenize_input(answer)
-
-                    # Wernicke's Comprehension for Question
-                    q_intent_logits, q_entity_logits = self.wernickes(q_input_ids, q_attention_mask)
-                    q_intent = torch.argmax(q_intent_logits, dim=1)
-                    q_entities = torch.argmax(q_entity_logits, dim=2)
-
-                    # Convert question to embeddings
-                    q_embedded = self.word_embeddings(q_input_ids)  # (1, seq_length, embed_dim)
-                    q_embedded = q_embedded.mean(dim=1)  # (1, embed_dim)
-
-                    # VAE Encoding
-                    _, _, _, z_q = self.vae(q_embedded)  # (1, latent_dim)
-
-                    # Brain Processing
-                    q_output = self.brain.forward(z_q)  # (1, output_dim)
-
-                    # Convert answer to embeddings
-                    a_embedded = self.word_embeddings(a_input_ids)  # (1, seq_length, embed_dim)
-                    a_embedded = a_embedded.mean(dim=1)  # (1, embed_dim)
-
-                    # VAE Encoding
-                    _, _, _, a_latent = self.vae(a_embedded)  # (1, latent_dim)
-
-                    # Brain Processing
-                    a_output = self.brain.forward(a_latent)  # (1, output_dim)
-
-                    # Calculate Loss
-                    loss = self.criterion(q_output, a_output)
-                    loss += FractalRegularization(lambda_param=0.01)(self.brain)
-                    loss.backward()
-
-                    # Gradient Clipping
-                    torch.nn.utils.clip_grad_norm_(self.brain.parameters(), max_norm=1.0)
-                    torch.nn.utils.clip_grad_norm_(self.vae.parameters(), max_norm=1.0)
-                    torch.nn.utils.clip_grad_norm_(self.word_embeddings.parameters(), max_norm=1.0)
-                    torch.nn.utils.clip_grad_norm_(self.wernickes.parameters(), max_norm=1.0)
-                    torch.nn.utils.clip_grad_norm_(self.brocas.parameters(), max_norm=1.0)
-
-                    # Update Parameters
-                    self.optimizer.step()
-
-                    total_loss += loss.item()
-
-                    # Dynamic Growth and Pruning
-                    self.brain.grow()
-                    self.brain.prune()
-                    self.brain.emotional_module.update_emotion(torch.mean(loss).item())
-                    self.brain.curiosity_module.update(z_q)
-                    self.long_term_memory.store(z_q, a_latent)
-                    self.continuous_learner.update((z_q, a_latent))
-
-                    if i % 10 == 0:
-                        logger.info(f"Epoch {epoch+1}, Pair {i+1}/{len(qa_pairs)}, Loss: {loss.item():.4f}")
-
-                except Exception as e:
-                    logger.error(f"Error processing pair: {question} | {answer}")
-                    logger.error(f"Error details: {str(e)}")
-                    errors += 1
-                    continue
-
-            avg_loss = total_loss / (len(qa_pairs) - errors) if len(qa_pairs) > errors else 0
-            logger.info(f"Epoch {epoch+1}/{epochs}, Average Loss: {avg_loss:.4f}, Errors: {errors}")
-
-            # Adjust learning rate based on performance
-            novelty = self.brain.curiosity_module.evaluate_novelty(z_q)
-            self.adaptive_lr.adjust(performance_metric=avg_loss, novelty_score=novelty)
-
-            self.scheduler.step()
-            self.save_state(f"model_state_epoch_{epoch+1}.pth")
-
-            yield epoch + 1, avg_loss, errors
-
-    def fractal_thinking(self, input_vector):
-        # This method is now integrated into the EnhancedFractalBrain's forward method
-        pass
-
-    def talk_with_lm_studio(self, initial_message, conversation_duration=60, delay=2):
-        message = initial_message
-        start_time = time.time()
-        conversation_log = []
-
-        while time.time() - start_time < conversation_duration:
-            ai_response = self.chat(message)
-            logger.info(f"DynamicAI:\n{ai_response}")
-            conversation_log.append(f"DynamicAI:\n{ai_response}")
-            yield "\n\n".join(conversation_log)
-
-            ai_message = ai_response.split("Response: ")[-1].strip()
-
-            if not ai_message:
-                logger.info("DynamicAI generated an empty response. Skipping LM Studio turn.")
-                conversation_log.append("DynamicAI: [No response generated. Still learning...]")
-                yield "\n\n".join(conversation_log)
-                time.sleep(delay)
-                continue
-
-            lm_studio_response = self.send_to_lm_studio(ai_message)
-            if lm_studio_response:
-                logger.info(f"LM Studio: {lm_studio_response}")
-                conversation_log.append(f"LM Studio: {lm_studio_response}")
-                message = lm_studio_response
-                yield "\n\n".join(conversation_log)
-            else:
-                logger.warning("No response from LM Studio. Ending conversation.")
-                break
-
-            time.sleep(delay)
-
-    def send_to_lm_studio(self, message):
-        if not message.strip():
-            logger.warning("Attempted to send an empty message to LM Studio. Skipping.")
-            return None
-
-        try:
-            completion = self.lm_studio_client.chat.completions.create(
-                model="unsloth/Llama-3.2-3B-Instruct-GGUF",
-                messages=[
-                    {"role": "system", "content": "You're talking to an experimental AI that is still learning to communicate. If it doesn't respond or sends empty messages, please be patient and continue the conversation."},
-                    {"role": "user", "content": message}
-                ],
-                temperature=0.7,
-            )
-            response = completion.choices[0].message.content
-            return response
-        except Exception as e:
-            logger.error(f"Error sending to LM Studio: {str(e)}")
-            return None
-
-# -----------------------------
 # 5. DynamicAI Class with All Enhancements
-# -----------------------------
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import random
-import logging
-import time
-import numpy as np
-
-from transformers import BertTokenizer, BertModel, GPT2Tokenizer, GPT2LMHeadModel
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# -----------------------------
-# DynamicAI Class with All Enhancements
 # -----------------------------
 
 class DynamicAI(nn.Module):
@@ -923,6 +651,9 @@ class DynamicAI(nn.Module):
         super(DynamicAI, self).__init__()
         self.embed_dim = embed_dim  # Store embed_dim as an instance variable
 
+        # External API Client (Assuming OpenAI's API for LM Studio)
+        self.lm_studio_client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+
         # Initialize Tokenizers
         self.bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.gpt_tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
@@ -938,7 +669,7 @@ class DynamicAI(nn.Module):
         # Initialize Embeddings and Models
         self.word_embeddings = nn.Embedding(vocab_size, embed_dim)
         self.vae = VAE(embed_dim, latent_dim)
-        self.brain = FractalBrain(embed_dim, output_dim, max_depth=max_depth)
+        self.brain = FractalBrain(latent_dim, output_dim, max_depth=max_depth)  # Updated input_dim to latent_dim
         self.wernickes = WernickesModule(num_intents=num_intents, num_entities=num_entities)
         self.brocas = BrocasModule()
 
@@ -963,9 +694,6 @@ class DynamicAI(nn.Module):
         self.word_to_index = {}
         self.index_to_word = {}
         self.next_index = 0
-
-        # External API Client (Assuming OpenAI's API for LM Studio)
-        self.lm_studio_client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
         # Initialize Long-Term Memory
         self.long_term_memory = LongTermMemory(memory_size=1000, key_size=latent_dim, value_size=output_dim)
@@ -1037,7 +765,6 @@ class DynamicAI(nn.Module):
 
         logger.info(f"Vocabulary built with {self.vocab_size} tokens.")
 
-
     def initialize_weights(self):
         """
         Initialize model weights using Xavier Uniform for linear layers and Kaiming Uniform for convolutional layers.
@@ -1083,22 +810,25 @@ class DynamicAI(nn.Module):
         Convert an embedding vector to the closest word in the embedding space.
         """
         with torch.no_grad():
+            # Reshape if necessary
+            if embedding.dim() == 1:
+                embedding = embedding.unsqueeze(0)
             # Normalize the embedding
-            embedding_norm = F.normalize(embedding, p=2, dim=1)  # Shape: (1, embed_dim)
+            embedding_norm = F.normalize(embedding, p=2, dim=1)  # Shape: (batch_size, embed_dim)
 
             # Normalize all word embeddings
             word_embeddings_norm = F.normalize(self.word_embeddings.weight, p=2, dim=1)  # Shape: (vocab_size, embed_dim)
 
             # Compute cosine similarity
-            similarities = torch.matmul(embedding_norm, word_embeddings_norm.t())  # Shape: (1, vocab_size)
+            similarities = torch.matmul(embedding_norm, word_embeddings_norm.t())  # Shape: (batch_size, vocab_size)
 
             # Get the index of the highest similarity
-            best_match_idx = torch.argmax(similarities, dim=1).item()
+            best_match_indices = torch.argmax(similarities, dim=1)  # Shape: (batch_size,)
 
-            # Retrieve the corresponding word
-            word = self.index_to_word.get(best_match_idx, "[UNKNOWN]")
+            # Retrieve the corresponding words
+            words = [self.index_to_word.get(idx.item(), "[UNKNOWN]") for idx in best_match_indices]
 
-            return word
+            return ' '.join(words)
 
     def chat(self, input_text, max_new_tokens=50, temperature=0.7):
         # Tokenize input using BERT tokenizer
@@ -1120,11 +850,14 @@ class DynamicAI(nn.Module):
             _, _, _, z_q = self.vae(embedded_q)
 
             # Brain Processing
-            output = self.brain.forward(z_q)
-            thinking_process.append(f"Brain Output Vector: {output.tolist()}")
+            brain_output = self.brain.forward(z_q)
 
-        # Convert brain's output to text to use as GPT-2's prompt
-        prompt_text = self.embedding_to_text(output)
+            # VAE Decoding
+            decoded_output = self.vae.decoder(brain_output)
+            thinking_process.append(f"Decoded Output Vector: {decoded_output.tolist()}")
+
+        # Convert decoded output to text to use as GPT-2's prompt
+        prompt_text = self.embedding_to_text(decoded_output)
         prompt_ids, prompt_attention_mask = self.tokenize_response(prompt_text)
 
         # Broca's Module: Production using the prompt
@@ -1211,24 +944,28 @@ class DynamicAI(nn.Module):
                     q_embedded = self.word_embeddings(q_input_ids)
                     q_embedded = q_embedded.mean(dim=1)
 
-                    # VAE Encoding
-                    _, _, _, z_q = self.vae(q_embedded)
+                    # VAE Encoding and Decoding for Question
+                    q_recon, q_mu, q_logvar, z_q = self.vae(q_embedded)
+                    q_latent_output = self.brain.forward(z_q)
+                    q_decoded_output = self.vae.decoder(q_latent_output)
 
-                    # Brain Processing
-                    q_output = self.brain.forward(z_q)
+                    # VAE Loss for Question
+                    vae_loss_q = self.vae.vae_loss(q_recon, q_embedded, q_mu, q_logvar)
 
                     # Convert answer to embeddings
                     a_embedded = self.word_embeddings(a_input_ids)
                     a_embedded = a_embedded.mean(dim=1)
 
-                    # VAE Encoding
-                    _, _, _, a_latent = self.vae(a_embedded)
+                    # VAE Encoding and Decoding for Answer
+                    a_recon, a_mu, a_logvar, a_latent = self.vae(a_embedded)
+                    a_latent_output = self.brain.forward(a_latent)
+                    a_decoded_output = self.vae.decoder(a_latent_output)
 
-                    # Brain Processing
-                    a_output = self.brain.forward(a_latent)
+                    # VAE Loss for Answer
+                    vae_loss_a = self.vae.vae_loss(a_recon, a_embedded, a_mu, a_logvar)
 
                     # Calculate Loss
-                    loss = self.criterion(q_output, a_output)
+                    loss = self.criterion(q_decoded_output, a_decoded_output) + vae_loss_q + vae_loss_a
                     loss += FractalRegularization(lambda_param=0.01)(self.brain)
                     loss.backward()
 
@@ -1273,6 +1010,25 @@ class DynamicAI(nn.Module):
 
             yield epoch + 1, avg_loss, errors
 
+    def think_mode(self, max_iterations=10):
+        """
+        Simulate the AI's internal thought process over multiple iterations without external input or output.
+        """
+        # Initialize a random latent thought vector
+        thought = torch.randn(1, self.vae.latent_dim)
+    
+        for iteration in range(max_iterations):
+            with torch.no_grad():
+                # Brain Processing
+                brain_output = self.brain.forward(thought)
+            
+                # VAE Decoding and Re-encoding
+                decoded_output = self.vae.decoder(brain_output)
+                _, _, _, new_thought = self.vae(decoded_output)
+        
+            # Update thought for next iteration
+            thought = new_thought
+
     def talk_with_lm_studio(self, initial_message, conversation_duration=60, delay=2):
         message = initial_message
         start_time = time.time()
@@ -1311,8 +1067,9 @@ class DynamicAI(nn.Module):
             return None
 
         try:
+            # Correct API call for LM Studio
             completion = self.lm_studio_client.chat.completions.create(
-                model="unsloth/Llama-3.2-3B-Instruct-GGUF",
+                model="unsloth/Llama-2-7b-Chat-hf",  # Replace with your LM Studio model name
                 messages=[
                     {"role": "system", "content": "You're talking to an experimental AI that is still learning to communicate. If it doesn't respond or sends empty messages, please be patient and continue the conversation."},
                     {"role": "user", "content": message}
@@ -1324,7 +1081,7 @@ class DynamicAI(nn.Module):
         except Exception as e:
             logger.error(f"Error sending to LM Studio: {str(e)}")
             return None
-
+        
 # -----------------------------
 # 6. Gradio Interface
 # -----------------------------
@@ -1360,11 +1117,9 @@ def create_gradio_interface(ai):
             conversation_log = log
             yield conversation_log
 
-    def handle_think_mode(initial_thought, max_iterations, temperature):
-        thought_log = ""
-        for log in ai.think_mode(initial_thought, max_iterations=int(max_iterations), temperature=float(temperature)):
-            thought_log = log
-            yield log  # Fixed to yield 'log' instead of 'thought_log'
+    def handle_think_mode(max_iterations):
+        ai.think_mode(max_iterations=int(max_iterations))
+        return "Think mode completed internally."
 
     with gr.Blocks() as interface:
         gr.Markdown("# Dynamic AI with Enhanced Fractal Neuron Model")
@@ -1385,9 +1140,7 @@ def create_gradio_interface(ai):
             start_conversation.click(handle_lm_studio_chat, inputs=[initial_message, duration, delay], outputs=conversation_log)
 
         with gr.Tab("Think Mode"):
-            initial_thought = gr.Textbox(label="Initial Thought")
             max_iterations = gr.Number(label="Max Iterations", value=10)
-            think_temperature = gr.Slider(minimum=0.1, maximum=2.0, value=0.7, label="Temperature")
             thought_log = gr.Textbox(label="Thought Log", lines=20)
             start_thinking = gr.Button("Start Thinking")
             stop_thinking = gr.Button("Stop Thinking")
@@ -1395,7 +1148,7 @@ def create_gradio_interface(ai):
             # Event handling for Think Mode
             think_event = start_thinking.click(
                 handle_think_mode,
-                inputs=[initial_thought, max_iterations, think_temperature],
+                inputs=[max_iterations],
                 outputs=thought_log
             )
             stop_thinking.click(lambda: None, cancels=[think_event])
