@@ -112,11 +112,8 @@ This will launch a web interface where you can interact with the model.
 - You might have to change the AI model name to fit yourse in the LM Studio, but on mine it works even when I do not change it. 
 
 ### Think Mode
-- **Initial Thought**: Provide a starting point for the AI's internal monologue.
-- **Max Iterations**: Set how many cycles the AI should think.
-- **Temperature**: Control the creativity of the thoughts.
-- **Thought Log**: Observe the AI's thought process as it generates new thoughts based on the previous ones.
-
+- Something will happen in its mind.
+- 
 ### Training on Q&A Pairs
 - **Q&A Pairs JSON File**: Upload a JSON file containing question-answer pairs in the format `[["Question1", "Answer1"], ["Question2", "Answer2"], ...]`.
 - **Number of Epochs**: Specify how many epochs to train on the data.
