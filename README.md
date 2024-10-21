@@ -264,17 +264,11 @@ Contributions are welcome! Please follow these steps:
 4. Submit a pull request detailing your changes.
 
 ## Acknowledgments
-- I thank myself for the weird idea. 
+- I thank myself for the weird idea. :D
 - **OpenAI**: For providing access to advanced language models and resources.
+- - Antorphic for making Claude that was there when the coding got hard. 
 - **PyTorch Community**: For the deep learning framework and support.
 - **Hugging Face**: For the transformers library and pre-trained models.
 - **AI Research Community**: For inspiration and foundational research in neural architectures.
 
 This project is intended for research and educational purposes. Use responsibly and ensure compliance with all relevant laws and regulations.
-
-
-### Steps
-#### Clone the repository
-```bash
-git clone https://github.com/yourusername/fractal-brain.git
-cd fractal-brain
