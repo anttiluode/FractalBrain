@@ -1,0 +1,11 @@
+torch==1.13.1
+transformers==4.24.0
+datasets==2.6.1
+tokenizers==0.13.2
+gradio==3.16.2
+torchtext==0.14.1
+openai==1.41.0
+numpy==1.23.5
+tqdm==4.64.1
+sentencepiece==0.1.97
+scipy==1.9.3
