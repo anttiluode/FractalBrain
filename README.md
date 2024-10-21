@@ -1,5 +1,7 @@
 # Fractal Brain
 (Sorry for the hype. The readme was written mainly by ChatGPT)
+(Dont expect it to talk folks. Perhaps if you tweak the amount of layers, mess with the vae - the bert - tokenization
+basically if you rewrite it to GPT lol) Ah. There went week and a half. 
 
 An advanced AI model implementing a fractal neuron architecture with enhanced modules for emotion, curiosity, and explainability. The Fractal Brain integrates components like BERT and GPT-2 for language understanding and generation, respectively, and employs a Variational Autoencoder (VAE) for latent space encoding.
 
