@@ -1,6 +1,3 @@
-# Writing the README.md file as per the provided details
-
-content = """
 # Fractal Brain
 
 An advanced AI model implementing a fractal neuron architecture with enhanced modules for emotion, curiosity, and explainability. The Fractal Brain integrates components like BERT and GPT-2 for language understanding and generation, respectively, and employs a Variational Autoencoder (VAE) for latent space encoding.
@@ -53,7 +50,8 @@ The goal of this project is to explore novel AI architectures inspired by biolog
 - **Gradio Interface**: Interactive web interface for chatting and experimenting with the model.
 
 ## Architecture Overview
-(Include an architecture diagram illustrating the components and their interactions.)
+
+![Fractal AI Architecture](./images/fractal_ai_architecture.svg)
 
 The Fractal Brain architecture consists of multiple interconnected modules:
 - **Input Processing**: Tokenization and embedding of input text using BERT and custom embeddings.
