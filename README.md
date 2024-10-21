@@ -2,6 +2,11 @@
 
 An advanced AI model implementing a fractal neuron architecture with enhanced modules for emotion, curiosity, and explainability. The Fractal Brain integrates components like BERT and GPT-2 for language understanding and generation, respectively, and employs a Variational Autoencoder (VAE) for latent space encoding.
 
+# Purpose
+
+To see how artificial neurons fire as the AI model is fed text. It is very possible that it will not learn to speak. But think of it as a 
+very advanced tamagochi. 
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)
@@ -66,6 +71,210 @@ The Fractal Brain architecture consists of multiple interconnected modules:
 - Python 3.7 or higher
 - PyTorch (with CUDA support if using GPU)
 - Git (for cloning the repository)
+### Steps
+#### Clone the repository
+```bash
+git clone https://github.com/yourusername/fractal-brain.git
+cd fractal-brain
+```
+
+#### Create a virtual environment (optional but recommended)
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
+
+#### Install the required packages
+```bash
+pip install -r requirements.txt
+```
+
+#### Download necessary data
+The script will automatically download the WikiText103 corpus and GloVe embeddings when run for the first time.
+
+## Usage
+Run the main script to start the Gradio interface:
+```bash
+python fractal_brain.py
+```
+This will launch a web interface where you can interact with the model.
+
+### Chat Interface
+- **Your Message**: Input text to chat with the AI.
+- **Temperature**: Adjust the randomness of the AI's responses. Higher values produce more creative outputs.
+- **AI Response**: View the AI's reply, including its thinking process and explanations.
+
+### Lm Studio interaction
+- Start LM studio, load a model in server mode, start server.
+- Put in initial message for LM Studio (Good idea to say what is happening, ie you are talking with AI that has yet to learn to speak)
+- Choose conversation duration and time between the messages
+- I have not tried this with more than one version of LM Studio, it does work on mine.
+- You might have to change the AI model name to fit yourse in the LM Studio, but on mine it works even when I do not change it. 
+
+### Think Mode
+- **Initial Thought**: Provide a starting point for the AI's internal monologue.
+- **Max Iterations**: Set how many cycles the AI should think.
+- **Temperature**: Control the creativity of the thoughts.
+- **Thought Log**: Observe the AI's thought process as it generates new thoughts based on the previous ones.
+
+### Training on Q&A Pairs
+- **Q&A Pairs JSON File**: Upload a JSON file containing question-answer pairs in the format `[["Question1", "Answer1"], ["Question2", "Answer2"], ...]`.
+- **Number of Epochs**: Specify how many epochs to train on the data.
+- **Training Status**: Monitor the training progress, loss values, and any errors encountered.
+
+### Saving and Loading State
+- **Filename**: Specify the filename to save to or load from.
+- **Save State**: Save the current state of the model, including weights and configurations.
+- **Load State**: Load a previously saved state to resume or reproduce results.
+
+
+## Components
+
+### Broca's Module
+- **Purpose**: Generates responses based on processed information from the Fractal Brain.
+- **Implementation**: Utilizes GPT-2 (GPT2LMHeadModel) for language generation.
+- **Features**:
+  - Generates text continuations based on input prompts.
+  - Adjustable parameters for maximum tokens and temperature.
+
+### Wernicke's Module
+- **Purpose**: Comprehends and interprets input text, extracting intents and entities.
+- **Implementation**: Uses BERT (BertModel) for language understanding.
+- **Features**:
+  - Intent classification through a linear layer.
+  - Entity extraction using a linear layer over BERT's outputs.
+
+### Fractal Neuron
+- **Purpose**: Simulates a neuron that can grow and prune its connections dynamically.
+- **Components**:
+  - **Dendrites (Synapse)**: Receive inputs and apply weights.
+  - **Soma**: Processes inputs, applies activation functions, and determines activity.
+  - **Axon**: Transmits outputs to other neurons.
+  - **Attention Mechanism**: Focuses on important parts of the input.
+  - **Emotional Module**: Modulates processing based on simulated emotional state.
+- **Features**:
+  - Ability to grow new child neurons if novelty is detected.
+  - Prunes least active child neurons to optimize resources.
+
+### Fractal Brain
+- **Purpose**: Hierarchical network of fractal neurons forming the core processing unit.
+- **Features**:
+  - **Growth and Pruning**: Adjusts its structure based on activity and novelty.
+  - **Curiosity Module**: Evaluates novelty in inputs to encourage learning.
+  - **Emotional Modulation**: Influences processing based on simulated emotions.
+  - **Long-Term Memory**: Stores experiences for retrieval during processing.
+- **Processing Flow**:
+  1. Modulates input with the emotional state.
+  2. Processes input through the root fractal neuron.
+  3. Dynamically grows or prunes neurons.
+  4. Updates emotional and curiosity modules.
+
+### Emotional Module
+- **Purpose**: Simulates an emotional state that influences processing.
+- **Implementation**:
+  - Maintains embeddings for different emotions.
+  - Updates current emotional state based on inputs.
+- **Functionality**:
+  - Modulates inputs by combining them with the emotional context.
+  - Updates emotions using a simple differential equation.
+
+### Curiosity Module
+- **Purpose**: Encourages the model to explore and learn from novel inputs.
+- **Mechanism**:
+  - Maintains a buffer of recent inputs.
+  - Evaluates the novelty of new inputs based on similarity to recent ones.
+  - Triggers growth in the fractal architecture if novelty exceeds a threshold.
+
+### Explainability Module
+- **Purpose**: Provides insights into the AI's decision-making process.
+- **Features**:
+  - Identifies the most influential neurons during processing.
+  - Generates explanations based on internal activations and contributions.
+- **Output**:
+  - Textual explanations highlighting which neurons influenced the response.
+
+### Variational Autoencoder (VAE)
+- **Purpose**: Encodes inputs into a latent space for efficient processing and reconstruction.
+- **Implementation**:
+  - Encoder network reduces input dimensions to a latent representation.
+  - Decoder reconstructs the input from the latent representation.
+  - Incorporates reparameterization trick for backpropagation through stochastic nodes.
+- **Loss Function**:
+  - Combines reconstruction loss with Kullback-Leibler divergence.
+
+### Long-Term Memory
+- **Purpose**: Stores key-value pairs of experiences for retrieval during processing.
+- **Implementation**:
+  - Fixed-size memory with FIFO replacement.
+  - Retrieves stored values based on cosine similarity with query keys.
+- **Functionality**:
+  - Aids in recalling relevant past experiences to influence current processing.
+
+### Adaptive Learning Rate
+- **Purpose**: Adjusts the learning rate dynamically to improve training efficiency.
+- **Mechanism**:
+  - Increases learning rate if performance improves and novelty is high.
+  - Decreases learning rate if performance degrades or novelty is low.
+- **Parameters**:
+  - Configurable minimum and maximum learning rates.
+  - Adjustment factor based on performance metrics.
+
+### Continuous Learner
+- **Purpose**: Enables the model to learn continuously from new experiences.
+- **Implementation**:
+  - Maintains an experience buffer.
+  - Periodically samples from the buffer for training.
+- **Functionality**:
+  - Supports online learning by integrating new data over time.
+
+## Dependencies
+### Python Libraries:
+- **torch**: Deep learning framework.
+- **transformers**: Access to BERT and GPT-2 models.
+- **datasets**: Loading datasets like WikiText103.
+- **tokenizers**: Efficient tokenization.
+- **gradio**: Building interactive web interfaces.
+- **torchtext**: Loading pre-trained embeddings like GloVe.
+- **numpy**: Numerical computations.
+- **pickle**: Object serialization.
+- **logging**: Event logging.
+
+### Models and Data:
+- **BERT**: Pre-trained model for language understanding.
+- **GPT-2**: Pre-trained model for language generation.
+- **GloVe Embeddings**: Pre-trained word embeddings.
+- **WikiText103 Corpus**: Large text corpus for building vocabulary.
+
+#### Install All Dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Limitations
+- **Experimental Nature**: The Fractal Brain is an experimental model and may produce unexpected or nonsensical outputs initially.
+- **Computational Resources**: The model can be resource-intensive. Running on a machine with sufficient memory and a capable GPU is recommended.
+- **Training Data**: Performance is heavily dependent on the quality and quantity of training data provided.
+- **Optimization**: Further tuning and optimization may be required for specific use cases.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contributing
+Contributions are welcome! Please follow these steps:
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Commit your changes with clear messages.
+4. Submit a pull request detailing your changes.
+
+## Acknowledgments
+- I thank myself for the weird idea. 
+- **OpenAI**: For providing access to advanced language models and resources.
+- **PyTorch Community**: For the deep learning framework and support.
+- **Hugging Face**: For the transformers library and pre-trained models.
+- **AI Research Community**: For inspiration and foundational research in neural architectures.
+
+This project is intended for research and educational purposes. Use responsibly and ensure compliance with all relevant laws and regulations.
+
 
 ### Steps
 #### Clone the repository
