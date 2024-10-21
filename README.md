@@ -110,7 +110,95 @@ This will launch a web interface where you can interact with the model.
 - Put in initial message for LM Studio (Good idea to say what is happening, ie you are talking with AI that has yet to learn to speak)
 - Choose conversation duration and time between the messages
 - I have not tried this with more than one version of LM Studio, it does work on mine.
-- You might have to change the AI model name to fit yourse in the LM Studio, but on mine it works even when I do not change it. 
+- You might have to change the AI model name to fit yourse in the LM Studio, but on mine it works even when I do not change it.
+
+Deepdive to the LM Studio - Fractal brain interaction: 
+
+## Handling of LM Studio Messages and Prevention of Parroting
+
+## Overview
+Our AI model is designed to engage in conversations with LM Studio without simply parroting or repeating LM Studio's messages. 
+This is achieved through a series of processing steps that abstract and reinterpret the input messages, ensuring that the AI 
+generates original responses based on its internal understanding and reasoning.
+
+Processing Pipeline
+When the AI receives a message from LM Studio, it undergoes several transformations:
+
+Input Text Tokenization: The message is tokenized using the BERT tokenizer, converting it into a sequence of tokens.
+
+Word Embeddings: The tokens are converted into embeddings—numerical vectors representing semantic information.
+
+Variational Autoencoder (VAE) Encoding: The embeddings are passed through the VAE encoder, compressing them into a lower-dimensional latent
+space representation (latent vector).
+
+Fractal Brain Processing: The latent vector is processed by the Fractal Brain, which applies complex transformations, including emotional
+modulation, attention mechanisms, and recursive neural processing.
+
+VAE Decoding: The processed latent vector is passed through the VAE decoder, reconstructing it back into the embedding space.
+
+Embedding to Text Conversion: The embeddings are converted back into text tokens, typically by finding the closest matching tokens in the vocabulary.
+
+Response Generation with GPT-2 (Broca's Module): The tokens or prompt generated from the embeddings are fed into the GPT-2 model to
+produce a coherent and contextually appropriate natural language response.
+
+Prevention of Parroting
+The architecture ensures that the AI does not parrot LM Studio's messages through several mechanisms:
+
+Abstracted Representations: By encoding messages into latent space via the VAE, the AI captures the essence of the input without
+retaining exact wording.
+
+Internal Reasoning: The Fractal Brain introduces internal reasoning and state changes that influence the response based on the
+AI's understanding.
+
+Transformation Layers: Multiple transformations (tokenization, embedding, encoding, decoding) significantly alter the input 
+message before response generation.
+
+Response Generation Mechanism: GPT-2 generates responses based on processed embeddings, reducing the likelihood of reproducing the input verbatim.
+
+Example Scenario
+LM Studio Message: "Can you tell me a joke about computers?"
+
+AI Processing Steps:
+
+Tokenization and Embedding: The message is converted into numerical vectors.
+
+VAE Encoding: Embeddings are compressed into latent space.
+
+Fractal Brain Processing: The AI associates "joke" and "computers" with relevant concepts.
+
+VAE Decoding: The latent representation is transformed back into embeddings.
+
+Response Generation: GPT-2 generates a response such as "Why did the computer show up at work late? Because it had a hard drive!"
+
+Outcome: The AI generates an original joke, not simply repeating LM Studio's message.
+
+Technical Safeguards Against Parroting
+To prevent parroting, the following safeguards are in place:
+
+Variational Autoencoder (VAE): The VAE introduces abstraction and slight randomness in the latent space, preventing exact reproduction of inputs.
+
+Fractal Brain's Internal State: The AI's internal state evolves during processing, influencing outputs based on accumulated knowledge and experiences.
+
+Embedding Similarity Measures: When converting embeddings back to text, the AI selects words based on similarity, not exact matches to the input tokens.
+
+Mitigation Strategies
+To further ensure the AI doesn't parrot LM Studio's messages:
+
+Proper Training: Train the VAE and Fractal Brain thoroughly on diverse datasets to enhance abstraction capabilities.
+
+Regularization Techniques: Use techniques like dropout or weight decay to prevent overfitting, which can cause the model to memorize inputs.
+
+Monitoring Outputs: Implement checks to compare input and output similarity, flagging instances where the output closely matches the input.
+
+Adjusting VAE Parameters: Fine-tune the VAE's latent space dimensions and loss functions to balance reconstruction quality and abstraction.
+
+Conclusion
+By processing LM Studio's messages through multiple transformation layers and internal reasoning mechanisms, the AI generates its own responses based 
+on understanding, ensuring that it does not simply parrot the input messages. This design allows for meaningful and original interactions 
+between the AI and LM Studio.
+
+## (Spoiler, I have not yet seen any sensical thinking, but I just made this script) Perhaps if you teach it a ton of stuff.)
+
 
 ### Think Mode
 - Something will happen in its mind.
