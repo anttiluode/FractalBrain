@@ -1,11 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
   <defs>
-    <style>
-      .box { fill: #f0f0f0; stroke: #333; stroke-width: 2; }
-      .module { fill: #e1f5fe; }
-      .label { font-family: Arial, sans-serif; font-size: 14px; }
-      .small-label { font-family: Arial, sans-serif; font-size: 12px; }
-      .arrow { fill: none; stroke: #666; stroke-width: 2; marker-end: url(#arrowhead); }
+    <style type="text/css">
+      .box { fill: white; stroke: black; stroke-width: 2; }
+      .text { font-family: Arial, sans-serif; font-size: 12px; }
+      .arrow { fill: none; stroke: black; stroke-width: 2; marker-end: url(#arrowhead); }
     </style>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" />
@@ -13,71 +11,71 @@
   </defs>
   
   <!-- Input -->
-  <rect x="50" y="50" width="120" height="60" class="box" />
-  <text x="110" y="85" text-anchor="middle" class="label">Input</text>
+  <rect x="10" y="50" width="80" height="40" class="box"/>
+  <text x="50" y="75" text-anchor="middle" class="text">Input</text>
   
   <!-- BERT Tokenizer -->
-  <rect x="50" y="150" width="120" height="60" class="box" />
-  <text x="110" y="175" text-anchor="middle" class="label">BERT Tokenizer</text>
-  <text x="110" y="195" text-anchor="middle" class="small-label">(Comprehension)</text>
-  
-  <!-- Word Embeddings -->
-  <rect x="50" y="250" width="120" height="60" class="box" />
-  <text x="110" y="285" text-anchor="middle" class="label">Word Embeddings</text>
+  <rect x="140" y="50" width="100" height="40" class="box"/>
+  <text x="190" y="75" text-anchor="middle" class="text">BERT Tokenizer</text>
   
   <!-- Wernicke's Module -->
-  <rect x="250" y="150" width="120" height="60" class="box module" />
-  <text x="310" y="185" text-anchor="middle" class="label">Wernicke's Module</text>
+  <rect x="290" y="50" width="120" height="40" class="box"/>
+  <text x="350" y="75" text-anchor="middle" class="text">Wernicke's Module</text>
   
-  <!-- VAE -->
-  <rect x="450" y="150" width="120" height="60" class="box" />
-  <text x="510" y="175" text-anchor="middle" class="label">VAE</text>
-  <text x="510" y="195" text-anchor="middle" class="small-label">(Encoder/Decoder)</text>
+  <!-- Word Embeddings -->
+  <rect x="140" y="120" width="100" height="40" class="box"/>
+  <text x="190" y="145" text-anchor="middle" class="text">Word Embeddings</text>
+  
+  <!-- VAE Encoder -->
+  <rect x="290" y="120" width="120" height="40" class="box"/>
+  <text x="350" y="145" text-anchor="middle" class="text">VAE Encoder</text>
   
   <!-- Fractal Brain -->
-  <rect x="650" y="150" width="180" height="300" rx="10" ry="10" class="box module" />
-  <text x="740" y="185" text-anchor="middle" class="label">Fractal Brain</text>
+  <rect x="460" y="85" width="140" height="140" class="box"/>
+  <text x="530" y="110" text-anchor="middle" class="text">Fractal Brain</text>
   
   <!-- Emotional Module -->
-  <rect x="680" y="220" width="120" height="60" class="box" />
-  <text x="740" y="255" text-anchor="middle" class="label">Emotional Module</text>
+  <rect x="470" y="120" width="120" height="30" class="box"/>
+  <text x="530" y="140" text-anchor="middle" class="text">Emotional Module</text>
   
   <!-- Curiosity Module -->
-  <rect x="680" y="300" width="120" height="60" class="box" />
-  <text x="740" y="335" text-anchor="middle" class="label">Curiosity Module</text>
+  <rect x="470" y="155" width="120" height="30" class="box"/>
+  <text x="530" y="175" text-anchor="middle" class="text">Curiosity Module</text>
   
   <!-- Attention Mechanism -->
-  <rect x="680" y="380" width="120" height="60" class="box" />
-  <text x="740" y="415" text-anchor="middle" class="label">Attention Mechanism</text>
+  <rect x="470" y="190" width="120" height="30" class="box"/>
+  <text x="530" y="210" text-anchor="middle" class="text">Attention Mechanism</text>
   
   <!-- Long-Term Memory -->
-  <rect x="650" y="480" width="180" height="60" class="box module" />
-  <text x="740" y="515" text-anchor="middle" class="label">Long-Term Memory</text>
+  <rect x="460" y="250" width="140" height="40" class="box"/>
+  <text x="530" y="275" text-anchor="middle" class="text">Long-Term Memory</text>
+  
+  <!-- VAE Decoder -->
+  <rect x="460" y="320" width="120" height="40" class="box"/>
+  <text x="520" y="345" text-anchor="middle" class="text">VAE Decoder</text>
   
   <!-- GPT Tokenizer -->
-  <rect x="850" y="150" width="120" height="60" class="box" />
-  <text x="910" y="175" text-anchor="middle" class="label">GPT Tokenizer</text>
-  <text x="910" y="195" text-anchor="middle" class="small-label">(Production)</text>
+  <rect x="630" y="320" width="100" height="40" class="box"/>
+  <text x="680" y="345" text-anchor="middle" class="text">GPT Tokenizer</text>
   
   <!-- Broca's Module -->
-  <rect x="850" y="250" width="120" height="60" class="box module" />
-  <text x="910" y="285" text-anchor="middle" class="label">Broca's Module</text>
+  <rect x="630" y="250" width="100" height="40" class="box"/>
+  <text x="680" y="275" text-anchor="middle" class="text">Broca's Module</text>
   
   <!-- Output -->
-  <rect x="850" y="350" width="120" height="60" class="box" />
-  <text x="910" y="385" text-anchor="middle" class="label">Output</text>
+  <rect x="710" y="180" width="80" height="40" class="box"/>
+  <text x="750" y="205" text-anchor="middle" class="text">Output</text>
   
   <!-- Arrows -->
-  <path d="M110 110 V150" class="arrow" />
-  <path d="M110 210 V250" class="arrow" />
-  <path d="M170 180 H250" class="arrow" />
-  <path d="M370 180 H450" class="arrow" />
-  <path d="M570 180 H650" class="arrow" />
-  <path d="M830 180 H850" class="arrow" />
-  <path d="M910 210 V250" class="arrow" />
-  <path d="M910 310 V350" class="arrow" />
-  
-  <!-- Bidirectional arrows -->
-  <path d="M740 450 V480" class="arrow" />
-  <path d="M740 480 V450" class="arrow" />
+  <path d="M90 70 H140" class="arrow"/>
+  <path d="M240 70 H290" class="arrow"/>
+  <path d="M350 90 V120" class="arrow"/>
+  <path d="M190 90 V120" class="arrow"/>
+  <path d="M240 140 H290" class="arrow"/>
+  <path d="M410 140 H460" class="arrow"/>
+  <path d="M530 225 V250" class="arrow"/>
+  <path d="M530 290 V320" class="arrow"/>
+  <path d="M580 340 H630" class="arrow"/>
+  <path d="M680 320 V290" class="arrow"/>
+  <path d="M730 250 V220" class="arrow"/>
 </svg>
