@@ -3,6 +3,14 @@
 (Dont expect it to talk folks. Perhaps if you tweak the amount of layers, mess with the vae - the bert - tokenization
 basically - if you rewrite it to GPT lol) Ah. There went week and a half. 
 
+# New Fractalvision
+
+[Fractal Vision Repository](https://github.com/anttiluode/fractalvision/blob/main/README.md)
+
+A incomplete visual version of the fractal brain that handles visual data instead of text. 
+
+# yada yada
+
 An advanced AI model implementing a fractal neuron architecture with enhanced modules for emotion, curiosity, and explainability. The Fractal Brain integrates components like BERT and GPT-2 for language understanding and generation, respectively, and employs a Variational Autoencoder (VAE) for latent space encoding.
 
 # Purpose
