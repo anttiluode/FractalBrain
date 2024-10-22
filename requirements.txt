@@ -1,9 +1,9 @@
 torch
-torchvision
-opencv-python
-numpy
 gradio
-Pillow
-tqdm
-logging
-gc
+openai==1.41
+transformers
+numpy           
+scipy           
+protobuf        
+requests        
+jsonschema   
