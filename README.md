@@ -1,4 +1,7 @@
 # Fractal Brain
+
+[Fractalbrain / Fractalvision project](https://www.youtube.com/watch?v=WiWGliWN5UI)
+
 (Sorry for the hype. The readme was written mainly by ChatGPT)
 (Dont expect it to talk folks. Perhaps if you tweak the amount of layers, mess with the vae - the bert - tokenization
 basically - if you rewrite it to GPT lol) Ah. There went week and a half. 
